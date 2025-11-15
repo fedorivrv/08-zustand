@@ -25,11 +25,13 @@ export async function generateMetadata({
     const title = note?.title
       ? `${note.title} — Note`
       : "Note details";
+
     const description =
-      note?.excerpt ||
-      (note?.content
-        ? `${String(note.content).slice(0, 150).replace(/\n/g, " ")}...`
-        : "View details of the note.");
+      note?.content
+        ? `${String(note.content)
+            .slice(0, 150)
+            .replace(/\n/g, " ")}...`
+        : "View details of the note.";
 
     return {
       title,
@@ -38,10 +40,8 @@ export async function generateMetadata({
         title,
         description,
       },
-      
     };
   } catch (err) {
-    
     return {
       title: "Note — Not found",
       description: "The requested note could not be loaded.",
