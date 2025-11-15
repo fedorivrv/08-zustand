@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   dehydrate,
   HydrationBoundary,
@@ -8,6 +9,35 @@ import { fetchNotes } from "@/lib/api";
 
 interface NotePageProps {
   params: Promise<{ slug: string[] }>;
+}
+
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string[] };
+}): Promise<Metadata> {
+  const slugArr = params?.slug ?? ["all"];
+  const rawCategory = slugArr[0] ?? "all";
+  const category =
+    rawCategory === "all" || rawCategory === "" ? "All notes" : rawCategory;
+
+  const title =
+    category === "All notes" ? "Notes — All" : `Notes — ${category}`;
+  const description =
+    category === "All notes"
+      ? "Browse all notes."
+      : `Notes filtered by "${category}".`;
+
+  return {
+    title,
+    description,
+    
+    openGraph: {
+      title,
+      description,
+    },
+  };
 }
 
 export default async function NotePage({ params }: NotePageProps) {
