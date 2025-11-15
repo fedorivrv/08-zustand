@@ -6,18 +6,18 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import NoteDetailsClient from "./NoteDetails.client";
+import { SITE_URL, IMG_URL } from "@/lib/constants";
 
 interface NoteDetailsPageProps {
   params: Promise<{ id: string }>;
 }
 
-
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const { id } = params;
+  const { id } = await params;   
 
   try {
     const note = await fetchNoteById(id);
@@ -26,12 +26,11 @@ export async function generateMetadata({
       ? `${note.title} — Note`
       : "Note details";
 
-    const description =
-      note?.content
-        ? `${String(note.content)
-            .slice(0, 150)
-            .replace(/\n/g, " ")}...`
-        : "View details of the note.";
+    const description = note?.content
+      ? `${String(note.content).slice(0, 150).replace(/\n/g, " ")}...`
+      : "View details of the note.";
+
+    const url = `${SITE_URL}notes/${id}`; 
 
     return {
       title,
@@ -39,15 +38,37 @@ export async function generateMetadata({
       openGraph: {
         title,
         description,
+        url,
+        images: [
+          {
+            url: IMG_URL,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
       },
     };
   } catch (err) {
+    const title = "Note — Not found";
+    const description = "The requested note could not be loaded.";
+    const url = `${SITE_URL}notes/${id}`;
+
     return {
-      title: "Note — Not found",
-      description: "The requested note could not be loaded.",
+      title,
+      description,
       openGraph: {
-        title: "Note — Not found",
-        description: "The requested note could not be loaded.",
+        title,
+        description,
+        url,
+        images: [
+          {
+            url: IMG_URL,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
       },
     };
   }
